@@ -1,0 +1,855 @@
+{
+  "name": "Codebasics AI Support Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b43718bc-1336-40f6-80c9-86d17d7be69e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "72c4d114-5567-4d3f-b804-e75d14ef8103",
+              "name": "query",
+              "value": "I have a billing dispute and need help from your support team.",
+              "type": "string"
+            },
+            {
+              "id": "f268d82c-7ca9-4f84-bdb7-5da88d68fd63",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "93b7e04a-7b53-4d1e-80a8-cbb42cc147d1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a support classifier.\n\nClassify the learner query into ONLY ONE category:\n\nCourse Access\nRefund\nEscalate\n\nReturn only category name.\n\nQuery:\n{{ $json.query }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        416,
+        0
+      ],
+      "id": "abf2aec0-c108-4370-a612-9558375c8e3a",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b9af0351-4232-4d8e-b961-a08074b8d296",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "Course Access",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "351af9a7-281f-45ad-a9df-dc526907a552",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI",
+          "mode": "list",
+          "cachedResultName": "Codebasics_Support_Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Learners",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "test@gmail.com"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        928,
+        -208
+      ],
+      "id": "0f11d6d4-6c1c-4027-a106-97b1e73f8783",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "79R0DcTms9WIagio",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=A learner has reported a course access issue.\n\nCourse:\n{{$json.Course}}\n\nAccess Status:\n{{$json.Access}}\n\nGenerate a professional support response.\n\nExample:\n\nYour course access is active.\nPlease log out and log in again.\nIf issue persists contact support.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1136,
+        -208
+      ],
+      "id": "ffcced6f-e0ba-4055-855e-e4d73d32570b",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI",
+          "mode": "list",
+          "cachedResultName": "Codebasics_Support_Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 325960926,
+          "mode": "list",
+          "cachedResultName": "Support_Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI/edit#gid=325960926"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Time": "={{$now}}",
+            "Query": "={{$node[\"Edit Fields\"].json[\"query\"]}}",
+            "Category": "={{$node[\"Basic LLM Chain\"].json[\"text\"]}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Query",
+              "displayName": "Query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1488,
+        -208
+      ],
+      "id": "2213bc12-2d7b-4a3d-ba00-3fc53538b1ec",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "79R0DcTms9WIagio",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7d5809a5-2237-4b2b-9c0c-a2d641c8526d",
+              "leftValue": "={{ $json.text }}\n",
+              "rightValue": "Refund",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        880,
+        96
+      ],
+      "id": "cc2c17e6-a567-4d1d-accf-7c272333f48e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI",
+          "mode": "list",
+          "cachedResultName": "Codebasics_Support_Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Learners",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "=Refund",
+              "lookupValue": "Yes"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1184,
+        96
+      ],
+      "id": "8eb59c38-4fc4-4cb0-b30c-09bcde11c05b",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "79R0DcTms9WIagio",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d4915a3c-e452-4072-ab2c-225873d5c392",
+              "name": "response",
+              "value": "Refund window has expired.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1648,
+        384
+      ],
+      "id": "403b4024-90fd-4c6f-8eb5-6e08eddc16d2",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "04dcccc4-c9b2-4f69-ad54-481f6c130fe8",
+              "leftValue": "={{$json.Refund}}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1392,
+        96
+      ],
+      "id": "0bd8cc37-18d6-472a-8e60-c763905f797d",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7fff7c11-638f-4803-9267-11ea3faec7d8",
+              "name": "response",
+              "value": "Your refund request is eligible. Our support team will process it within 5 business days.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1600,
+        0
+      ],
+      "id": "21da762d-ed7f-4dd7-a962-83d6a4688044",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bc71b218-594c-467e-81ef-2b507caa8ad9",
+              "name": "response",
+              "value": "This issue requires human review. Ticket created and forwarded to support team.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        336
+      ],
+      "id": "05586a96-b7e5-4f28-af4e-092cd8d68f4d",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        352,
+        208
+      ],
+      "id": "a663f8aa-d597-44fd-ba41-5ffbd1314a8c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MF4gn4XT18jVOqVa",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1072,
+        0
+      ],
+      "id": "62bd11fb-483b-4aa1-bba2-b4a57fd6b251",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MF4gn4XT18jVOqVa",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI",
+          "mode": "list",
+          "cachedResultName": "Codebasics_Support_Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 325960926,
+          "mode": "list",
+          "cachedResultName": "Support_Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI/edit#gid=325960926"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Time": "={{$now}}",
+            "Query": "={{$node[\"Edit Fields\"].json[\"query\"]}}",
+            "Category": "={{$node[\"Basic LLM Chain\"].json[\"text\"]}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Query",
+              "displayName": "Query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1792,
+        0
+      ],
+      "id": "eaf32827-03e3-49d4-aa9a-83c65a225e40",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "79R0DcTms9WIagio",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI",
+          "mode": "list",
+          "cachedResultName": "Codebasics_Support_Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 325960926,
+          "mode": "list",
+          "cachedResultName": "Support_Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI/edit#gid=325960926"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Time": "={{$now}}",
+            "Query": "={{$node[\"Edit Fields\"].json[\"query\"]}}",
+            "Category": "={{$node[\"Basic LLM Chain\"].json[\"text\"]}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Query",
+              "displayName": "Query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1856,
+        384
+      ],
+      "id": "965b9268-bb69-4edc-9871-31f0050afc87",
+      "name": "Append row in sheet2",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "79R0DcTms9WIagio",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI",
+          "mode": "list",
+          "cachedResultName": "Codebasics_Support_Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 325960926,
+          "mode": "list",
+          "cachedResultName": "Support_Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15hbl9AjLjAAkJbnnZdkOJzdUn-1_MqyFf6TuPlPbQBI/edit#gid=325960926"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Time": "={{$now}}",
+            "Query": "={{$node[\"Edit Fields\"].json[\"query\"]}}",
+            "Category": "={{$node[\"Basic LLM Chain\"].json[\"text\"]}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Query",
+              "displayName": "Query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        864,
+        336
+      ],
+      "id": "47fe457f-c9bb-48ff-a9dc-ab323872e4c1",
+      "name": "Append row in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "79R0DcTms9WIagio",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "90c5b6b0-5e5a-43eb-a208-28211ae7dc86",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "aa19342c3ae444f04219ddd57c9e3cbae70841b6e81733fad58b666152bbeb71"
+  },
+  "nodeGroups": [],
+  "id": "JVRx0HaY1qhDjXss",
+  "tags": []
+}
